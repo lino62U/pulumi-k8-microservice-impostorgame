@@ -1,0 +1,5 @@
+{
+  "name": "Impostor Game",
+  "description": "A web application for playing a social deduction game where players must find the impostor among them. Create rooms, invite friends, and test your deception skills.",
+  "requestFramePermissions": []
+}
