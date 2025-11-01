@@ -1,20 +1,26 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Frontend
 
-# Run and deploy your AI Studio app
+This is a React-based frontend application for Impostor Game
 
-This contains everything you need to run your app locally.
+## Commands
+1. Install `pnpm` if you haven't already:
 
-View your app in AI Studio: https://ai.studio/apps/drive/1BG4lCt5HjVamqQfsMzFfuCl0REWv-AHM
+  ```bash
+  curl -fsSL https://get.pnpm.io/install.sh | sh -
+   ```
+2. Install dependencies:
 
-## Run Locally
+  ```bash
+  pnpm install
+  ```
+3. For development:
 
-**Prerequisites:**  Node.js
+  ```bash
+  pnpm run dev
+  ```
 
+4. For play:
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   pnpm run play
+   ```
