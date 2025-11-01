@@ -1,8 +1,7 @@
 import { Room, Player, RoomSettings } from './types';
 
 const API_BASE_URL_PRIMARY = 'https://5dn3g5xj-3001.brs.devtunnels.ms/api';
-const API_BASE_URL_FALLBACK = 'http://localhost:3001/api'; // asegúrate del path correcto
-
+const API_BASE_URL_FALLBACK = 'http://10.7.135.30:3001/api'; // asegúrate del path correcto
 
 const apiRequest = async (endpoint: string, method: string = 'GET', body?: any): Promise<any | null> => {
     const options: RequestInit = {
