@@ -3,33 +3,40 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./database.js');
 
-const app = express();
-const PORT = 3001;
+const { THEME_LISTS, FOOTBALL_PLAYERS, FAMOUS_MOVIES, UNIVERSITY_MAJORS } = require('./constants.js');
 
-app.use(cors());
+const app = express();
+const PORT = 5000;
+
+app.use(cors({
+  origin: '*' 
+}));
 app.use(express.json());
 
 
-const FOOTBALL_PLAYERS = [
-  'Lionel Messi', 'Cristiano Ronaldo', 'Neymar Jr', 'Kylian Mbappé', 'Robert Lewandowski', 'Kevin De Bruyne', 'Luka Modrić', 'Sergio Ramos', 'Virgil van Dijk', 'Sadio Mané',
-  'Mohamed Salah', 'Karim Benzema', 'Erling Haaland', 'Zlatan Ibrahimović', 'Andrés Iniesta', 'Xavi Hernández',
-  'Wayne Rooney', 'Frank Lampard', 'Steven Gerrard', 'John Terry', 'Didier Drogba', 'Eden Hazard', 'Thibaut Courtois', 'Jan Oblak',
-  'Manuel Neuer', 'Iker Casillas', 'Gianluigi Buffon', 'Giorgio Chiellini', 'Leonardo Bonucci', 'Andrea Pirlo', 'Francesco Totti', 'Daniele De Rossi', 'Paulo Dybala', 'Ángel Di María',
-  'Antoine Griezmann', 'Sergio Busquets', 'Jordi Alba', 'Gerard Piqué', 'David Villa', 'Fernando Torres', 'David Silva', 'Cesc Fàbregas',
-  'Mesut Özil', 'Toni Kroos', 'Thomas Müller', 'Philipp Lahm', 'Bastian Schweinsteiger', 'Arjen Robben', 'Franck Ribéry', 'Joshua Kimmich', 'İlkay Gündoğan', 'Bernardo Silva',
-  'Riyad Mahrez', 'Raheem Sterling', 'Harry Kane', 'Heung-min Son', 'Marcus Rashford', 'Bruno Fernandes', 'Casemiro', 'Vinícius Júnior', 'Rodrygo', 'Federico Valverde',
-  'Marco Reus', 'Pierre-Emerick Aubameyang', 'Alexis Sánchez', 'Arturo Vidal', 'James Rodríguez', 'Radamel Falcao', 'Juan Cuadrado', 'Edinson Cavani',
-  'Luis Suárez', 'Diego Godín', 'Lautaro Martínez', 'Javier Zanetti', 'Carlos Tevez', 'Sergio Agüero',
-  'Yaya Touré', 'David Alaba', 'Marcelo', 'Dani Alves', 'Thiago Silva', 'Marquinhos', 'N\'Golo Kanté', 'Paul Pogba', 'Kingsley Coman', 'Achraf Hakimi',
-  'Yassine Bounou', 'Hakim Ziyech', 'Kalidou Koulibaly', 'Victor Osimhen', 'Khvicha Kvaratskhelia', 'Jude Bellingham', 'Bukayo Saka', 'Martin Ødegaard', 'Declan Rice', 'Rodri',
-  'Alisson Becker', 'Ederson', 'Marc-André ter Stegen', 'Keylor Navas'
-];
-
 const assignRolesAndWords = async (room) => {
   const { theme, impostorCount } = room.settings;
-  const word = theme.type === 'CUSTOM'
-    ? theme.value
-    : FOOTBALL_PLAYERS[Math.floor(Math.random() * FOOTBALL_PLAYERS.length)];
+  let word; // La palabra que se asignará
+
+  // --- LÓGICA MODIFICADA ---
+  if (theme.type === 'CUSTOM') {
+    word = theme.value;
+  } else {
+    // 1. Buscar la lista correspondiente en el mapa THEME_LISTS
+    // theme.value será 'Football Players', 'Famous Movies', etc.
+    const selectedList = THEME_LISTS[theme.value];
+
+    if (selectedList) {
+      // 2. Si encontramos la lista, elegimos una palabra al azar de ella
+      word = selectedList[Math.floor(Math.random() * selectedList.length)];
+    } else {
+      // 3. Fallback: si el frontend envía un tema desconocido, usamos Football por defecto
+      console.warn(`Tema predefinido desconocido: ${theme.value}. Usando Football Players.`);
+      word = FOOTBALL_PLAYERS[Math.floor(Math.random() * FOOTBALL_PLAYERS.length)];
+    }
+  }
+  // --- FIN DE LA LÓGICA MODIFICADA ---
+
 
   const playersToAssign = [...room.players];
 
@@ -50,11 +57,10 @@ const assignRolesAndWords = async (room) => {
   for (let i = 0; i < playersToAssign.length; i++) {
     const player = playersToAssign[i];
     const role = i < impostorCount ? 'IMPOSTOR' : 'CREWMATE';
-    const playerWord = role === 'IMPOSTOR' ? null : word;
+    const playerWord = role === 'IMPOSTOR' ? null : word; // 'word' ahora viene de la lista correcta
     await db.run(`UPDATE players SET role = ?, word = ? WHERE id = ?`, [role, playerWord, player.id]);
   }
 };
-
 
 // --- ROUTES ---
 
